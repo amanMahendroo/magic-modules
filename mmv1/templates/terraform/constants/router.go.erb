@@ -29,3 +29,29 @@ func resourceComputeRouterCustomDiff(_ context.Context, diff *schema.ResourceDif
 
 	return nil
 }
+
+func advertisedIpRangesDiffSuppress(_, old, new, d *schema.ResourceData) bool {
+    // Suppress diff when advertised ip ranges have the same values
+    // even if they are in a different order
+
+    old_arr := old.([]interface{})
+    new_arr := new.([]interface{})
+
+    if len(old_arr) != len(new_arr) {
+        return false
+    }
+
+    for _, old_ip := range old_arr {
+        found := false
+        for _, new_ip := range new_arr {
+            if old_ip == new_ip {
+                found = true
+                break
+            }
+        }
+        if (!found) {
+            return false
+        }
+    }
+    return true
+}
